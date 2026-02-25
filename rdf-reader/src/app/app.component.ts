@@ -1,13 +1,22 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RdfService } from './services/rdf.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+  imports: [CommonModule], // 👈 IMPORTANTE
+  templateUrl: './app.component.html'
 })
-export class AppComponent {
-  title = 'rdf-reader';
+export class AppComponent implements OnInit {
+
+  rdfData: any;
+
+  constructor(private rdfService: RdfService) {}
+
+  ngOnInit(): void {
+    this.rdfService.getRdf().subscribe(data => {
+      this.rdfData = data;
+    });
+  }
 }
