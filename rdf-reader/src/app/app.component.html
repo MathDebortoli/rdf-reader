@@ -1,9 +1,12 @@
-<div style="padding:20px">
-  <h2>RDF JSON-LD do GraphDB</h2>
+<h1>Dashboard RDF</h1>
+<app-dashboard></app-dashboard>
 
-  <pre *ngIf="rdfData">
-{{ rdfData | json }}
-  </pre>
+<p>Total de patentes: {{ totalPatentes }}</p>
 
-  <p *ngIf="!rdfData">Carregando...</p>
+<div *ngFor="let p of patentes">
+  <hr>
+  <p><strong>Número:</strong> {{ p.numero }}</p>
+  <p><strong>Título:</strong> {{ p.titulo }}</p>
+  <p><strong>Data:</strong> {{ p.data }}</p>
+  <p><strong>IPC:</strong> {{ p.ipc }}</p>
 </div>

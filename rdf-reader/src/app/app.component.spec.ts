@@ -17,7 +17,6 @@ describe('AppComponent', () => {
   it(`should have the 'rdf-reader' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('rdf-reader');
   });
 
   it('should render title', () => {

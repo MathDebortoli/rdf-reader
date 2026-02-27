@@ -1,0 +1,48 @@
+<div class="dashboard-header">
+  <h1>Dashboard RDF</h1>
+  <div class="buttons">
+
+</div>
+
+<mat-grid-list cols="2" rowHeight="150px" gutterSize="15px">
+  <mat-grid-tile>
+    <mat-card class="total-card">
+      <mat-card-title>Total de Patentes</mat-card-title>
+      <h1>{{ totalPatentes }}</h1>
+    </mat-card>
+  </mat-grid-tile>
+
+    <mat-card>
+      <mat-card-title>Distribuição por Ano</mat-card-title>
+      <canvas #graficoCanvas></canvas>
+    </mat-card>
+</mat-grid-list>
+
+  <mat-card-title>Lista de Patentes</mat-card-title>
+
+  <table mat-table [dataSource]="patentes" class="mat-elevation-z8">
+
+    <ng-container matColumnDef="numero">
+      <th mat-header-cell *matHeaderCellDef> Número </th>
+      <td mat-cell *matCellDef="let p"> {{p.numero}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="titulo">
+      <th mat-header-cell *matHeaderCellDef> Título </th>
+      <td mat-cell *matCellDef="let p"> {{p.titulo}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="data">
+      <th mat-header-cell *matHeaderCellDef> Data </th>
+      <td mat-cell *matCellDef="let p"> {{p.data}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="ipc">
+      <th mat-header-cell *matHeaderCellDef> IPC </th>
+      <td mat-cell *matCellDef="let p"> {{p.ipc}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['numero','titulo','data','ipc']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['numero','titulo','data','ipc'];"></tr>
+  </table>
+
