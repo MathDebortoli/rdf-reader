@@ -108,6 +108,7 @@ table {
 th {
   background: #0f172a;
   color: white;
+  font-weight: bold;
   padding: 16px;
   text-align: left;
   font-weight: 600;
@@ -115,7 +116,7 @@ th {
 
 td {
   padding: 16px;
-  color: #334155;
+  color: #e2e8f0;
 }
 
 /* remove linhas fortes */
@@ -123,10 +124,6 @@ tr {
   border-bottom: none;
 }
 
-/* zebra suave */
-tr:nth-child(even) {
-  background-color: #f8fafc;
-}
 
 /* hover elegante */
 tr:hover {
