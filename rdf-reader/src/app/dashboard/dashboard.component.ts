@@ -5,7 +5,6 @@ import { Chart } from 'chart.js/auto';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -15,21 +14,25 @@ import { MatButtonModule } from '@angular/material/button';
     CommonModule,
     MatCardModule,
     MatTableModule,
-    MatGridListModule,
-    MatButtonModule,
+    MatButtonModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
+
   @ViewChild('graficoCanvas') graficoCanvas!: ElementRef;
 
   patentes: any[] = [];
-  anos: number[] = [];
-  quantidades: number[] = [];
-  totalPatentes = 0;
+  colunas: string[] = ['numero', 'titulo', 'ano', 'ipc'];
 
-  modoConsulta: 'LISTA' | 'GRAFICO' = 'LISTA';
+  totalPatentes = 0;
+  anoMaisAntigo: any = '-';
+  anoMaisRecente: any = '-';
+  decadaMaisProdutiva: any = '-';
+  ipcMaisFrequente: any = '-';
+
+  modoGrafico: 'ANO' | 'DECADA' = 'ANO';
 
   private chart: any;
 
@@ -37,89 +40,152 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.carregarLista();
-    this.carregarGrafico();
   }
 
-  alternarConsulta(tipo: 'LISTA' | 'GRAFICO') {
-    this.modoConsulta = tipo;
-  }
-
-  // 🔵 Normaliza JSON-LD vindo como ARRAY
+  // ==========================
+  // NORMALIZA JSON-LD
+  // ==========================
   private normalizeJsonLd(data: any[]): any[] {
-    return data.map((item: any) => {
-      return {
-        numero: item['http://example.org/pedido-patente/numeroDoPedido']?.[0]?.['@value'] || null,
-        titulo: item['http://example.org/pedido-patente/titulo']?.[0]?.['@value'] || null,
-        data: item['http://example.org/pedido-patente/dataDoPrimeiroDeposito']?.[0]?.['@value'] || null,
-        ipc: item['http://example.org/pedido-patente/classificacaoIPC']?.[0]?.['@value'] || null,
-        ano: item['http://example.org/pedido-patente/ano']?.[0]?.['@value'] || null,
-        quantidade: item['http://example.org/pedido-patente/quantidade']?.[0]?.['@value'] || null
-      };
-    });
+
+    return data
+      .filter((item: any) =>
+        item['@type']?.includes('http://example.org/pedido-patente/PedidoPatente')
+      )
+      .map((item: any) => {
+
+        const dataDeposito =
+          item['http://example.org/pedido-patente/dataDoPrimeiroDeposito']?.[0]?.['@value'] || null;
+
+        let anoExtraido: number | null = null;
+
+        if (dataDeposito && dataDeposito.length >= 4) {
+          anoExtraido = parseInt(dataDeposito.substring(0, 4));
+        }
+
+        return {
+          numero: item['http://example.org/pedido-patente/numeroDoPedido']?.[0]?.['@value'] || '-',
+          titulo: item['http://example.org/pedido-patente/titulo']?.[0]?.['@value'] || '-',
+          ipc: item['http://example.org/pedido-patente/classificacaoIPC']?.[0]?.['@value'] || '-',
+          ano: anoExtraido
+        };
+      });
   }
 
+  // ==========================
+  // CARREGAR DADOS
+  // ==========================
   carregarLista() {
     this.rdfService.getPatentes().subscribe((res) => {
 
-      console.log("RESPOSTA BRUTA:", res);
-
-      // 🔥 AQUI ESTÁ A CORREÇÃO
       const graph = Array.isArray(res) ? res : res['@graph'] || [];
 
-      const data = this.normalizeJsonLd(graph);
-
-      this.patentes = data.filter(p => p.numero !== null);
+      this.patentes = this.normalizeJsonLd(graph);
 
       this.totalPatentes = this.patentes.length;
 
-      console.log("PATENTES NORMALIZADAS:", this.patentes);
+      this.calcularMetricas();
     });
   }
 
-  carregarGrafico() {
-    this.rdfService.getPatentesPorAno().subscribe((res) => {
+  // ==========================
+  // MÉTRICAS
+  // ==========================
+  calcularMetricas() {
 
-      const graph = Array.isArray(res) ? res : res['@graph'] || [];
+    const anos = this.patentes
+      .map(p => p.ano)
+      .filter(a => a !== null)
+      .sort((a, b) => a - b);
 
-      const data = this.normalizeJsonLd(graph);
+    if (anos.length > 0) {
+      this.anoMaisAntigo = anos[0];
+      this.anoMaisRecente = anos[anos.length - 1];
+    }
 
-      this.anos = [];
-      this.quantidades = [];
+    const contagemDecada: any = {};
+    const contagemIPC: any = {};
 
-      data.forEach((item: any) => {
-        if (item.ano && item.quantidade) {
-          this.anos.push(parseInt(item.ano));
-          this.quantidades.push(parseInt(item.quantidade));
+    this.patentes.forEach(p => {
+
+      if (p.ano) {
+        const decada = Math.floor(p.ano / 10) * 10;
+        contagemDecada[decada] = (contagemDecada[decada] || 0) + 1;
+      }
+
+      if (p.ipc) {
+        contagemIPC[p.ipc] = (contagemIPC[p.ipc] || 0) + 1;
+      }
+    });
+
+    this.decadaMaisProdutiva = this.getMaior(contagemDecada);
+    this.ipcMaisFrequente = this.getMaior(contagemIPC);
+  }
+
+  private getMaior(obj: any) {
+    let maior = '-';
+    let max = 0;
+
+    for (const chave in obj) {
+      if (obj[chave] > max) {
+        max = obj[chave];
+        maior = chave + ' (' + obj[chave] + ')';
+      }
+    }
+
+    return maior;
+  }
+
+  // ==========================
+  // GRÁFICO
+  // ==========================
+  mostrarGrafico(tipo: 'ANO' | 'DECADA') {
+
+    this.modoGrafico = tipo;
+
+    const contagem: any = {};
+
+    this.patentes.forEach(p => {
+
+      if (!p.ano) return;
+
+      if (tipo === 'ANO') {
+        contagem[p.ano] = (contagem[p.ano] || 0) + 1;
+      } else {
+        const decada = Math.floor(p.ano / 10) * 10;
+        contagem[decada] = (contagem[decada] || 0) + 1;
+      }
+    });
+
+    const labels = Object.keys(contagem).sort();
+    const valores = labels.map(l => contagem[l]);
+
+    setTimeout(() => {
+
+      if (!this.graficoCanvas) return;
+
+      if (this.chart) {
+        this.chart.destroy();
+      }
+
+      const ctx = this.graficoCanvas.nativeElement.getContext('2d');
+
+      this.chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: tipo === 'ANO' ? 'Patentes por Ano' : 'Patentes por Década',
+              data: valores
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
         }
       });
 
-      setTimeout(() => {
-        if (!this.graficoCanvas) return;
-
-        if (this.chart) {
-          this.chart.destroy();
-        }
-
-        const ctx = this.graficoCanvas.nativeElement.getContext('2d');
-
-        this.chart = new Chart(ctx, {
-          type: 'bar',
-          data: {
-            labels: this.anos,
-            datasets: [
-              {
-                label: 'Patentes por Ano',
-                data: this.quantidades,
-                backgroundColor: '#3f51b5',
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-          },
-        });
-      }, 200);
-    });
+    }, 200);
   }
 }

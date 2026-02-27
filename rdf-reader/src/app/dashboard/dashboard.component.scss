@@ -1,64 +1,135 @@
+/* ===== FUNDO GLOBAL ===== */
 :host {
   display: block;
-  padding: 30px;
-  background: #f4f6f9;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: 'Segoe UI', sans-serif;
 }
 
-.dashboard-header {
+/* ===== HEADER SUPERIOR ===== */
+.page-header {
+  padding: 60px 20px 40px 20px;
+  text-align: center;
+  color: white;
+}
+
+.page-header h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.page-header p {
+  font-size: 18px;
+  opacity: 0.85;
+}
+
+/* ===== CONTAINER PRINCIPAL ===== */
+.dashboard {
+  max-width: 1400px;
+  margin: 0 auto 60px auto;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 50px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+}
+
+/* ===== CARDS ===== */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.card {
+  padding: 30px;
+  text-align: center;
+  border-radius: 16px;
+  background: #f1f5f9;
+  transition: 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  background: #e2e8f0;
+}
+
+.card h3 {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.card h1 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ===== BOTÕES ===== */
+.botoes {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-
-  h1 {
-    font-size: 28px;
-    font-weight: 600;
-  }
-
-  .buttons button {
-    margin-left: 10px;
-  }
-}
-
-mat-card {
-  border-radius: 18px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  padding: 15px;
-
-  &:hover {
-    transform: translateY(-2px);
-    transition: 0.3s ease;
-  }
-}
-
-.total-card {
-  display: flex;
-  flex-direction: column;
   justify-content: center;
-  align-items: center;
-
-  h1 {
-    font-size: 52px;
-    font-weight: 700;
-    color: #3f51b5;
-    margin: 10px 0 0 0;
-  }
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
-.table-card {
-  margin-top: 20px;
-
-  table {
-    width: 100%;
-
-    th {
-      font-weight: 600;
-    }
-  }
+/* ===== GRÁFICO ===== */
+.grafico {
+  height: 420px;
+  margin-bottom: 60px;
+  padding: 25px;
+  background: #f8fafc;
+  border-radius: 16px;
 }
 
-canvas {
-  width: 100% !important;
-  height: 100% !important;
+/* ===== TÍTULO DA TABELA ===== */
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+/* ===== TABELA MODERNA ===== */
+.tabela {
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #0f172a;
+  color: white;
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 16px;
+  color: #334155;
+}
+
+/* remove linhas fortes */
+tr {
+  border-bottom: none;
+}
+
+/* zebra suave */
+tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+/* hover elegante */
+tr:hover {
+  background-color: #e2e8f0;
+  transition: 0.2s ease;
 }

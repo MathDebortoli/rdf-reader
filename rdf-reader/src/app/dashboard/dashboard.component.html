@@ -1,48 +1,83 @@
-<div class="dashboard-header">
-  <h1>Dashboard RDF</h1>
-  <div class="buttons">
 
+<div class="page-header">
+  <div class="header-content">
+    <h1>Dashboard RDF</h1>
+    <p>Análise Inteligente de Patentes</p>
+  </div>
 </div>
 
-<mat-grid-list cols="2" rowHeight="150px" gutterSize="15px">
-  <mat-grid-tile>
-    <mat-card class="total-card">
-      <mat-card-title>Total de Patentes</mat-card-title>
+<div class="dashboard">
+  
+  <div class="cards">
+
+    <mat-card class="card">
+      <h3>Total de Patentes</h3>
       <h1>{{ totalPatentes }}</h1>
     </mat-card>
-  </mat-grid-tile>
 
-    <mat-card>
-      <mat-card-title>Distribuição por Ano</mat-card-title>
-      <canvas #graficoCanvas></canvas>
+    <mat-card class="card">
+      <h3>Ano Mais Antigo</h3>
+      <h1>{{ anoMaisAntigo }}</h1>
     </mat-card>
-</mat-grid-list>
 
-  <mat-card-title>Lista de Patentes</mat-card-title>
+    <mat-card class="card">
+      <h3>Ano Mais Recente</h3>
+      <h1>{{ anoMaisRecente }}</h1>
+    </mat-card>
 
-  <table mat-table [dataSource]="patentes" class="mat-elevation-z8">
+    <mat-card class="card">
+      <h3>Década Mais Produtiva</h3>
+      <h1>{{ decadaMaisProdutiva }}</h1>
+    </mat-card>
+
+    <mat-card class="card">
+      <h3>IPC Mais Frequente</h3>
+      <h1>{{ ipcMaisFrequente }}</h1>
+    </mat-card>
+
+  </div>
+
+  <div class="botoes">
+    <button mat-raised-button color="primary" (click)="mostrarGrafico('ANO')">
+      Gráfico por Ano
+    </button>
+
+    <button mat-raised-button color="accent" (click)="mostrarGrafico('DECADA')">
+      Gráfico por Década
+    </button>
+  </div>
+
+  <div class="grafico">
+    <canvas #graficoCanvas></canvas>
+  </div>
+
+  <h2>Tabela de Patentes</h2>
+
+  <table mat-table [dataSource]="patentes" class="mat-elevation-z8 tabela">
 
     <ng-container matColumnDef="numero">
-      <th mat-header-cell *matHeaderCellDef> Número </th>
-      <td mat-cell *matCellDef="let p"> {{p.numero}} </td>
+      <th mat-header-cell *matHeaderCellDef>Número</th>
+      <td mat-cell *matCellDef="let p">{{ p.numero }}</td>
     </ng-container>
 
     <ng-container matColumnDef="titulo">
-      <th mat-header-cell *matHeaderCellDef> Título </th>
-      <td mat-cell *matCellDef="let p"> {{p.titulo}} </td>
+      <th mat-header-cell *matHeaderCellDef>Título</th>
+      <td mat-cell *matCellDef="let p">{{ p.titulo }}</td>
     </ng-container>
 
-    <ng-container matColumnDef="data">
-      <th mat-header-cell *matHeaderCellDef> Data </th>
-      <td mat-cell *matCellDef="let p"> {{p.data}} </td>
+    <ng-container matColumnDef="ano">
+      <th mat-header-cell *matHeaderCellDef>Ano</th>
+      <td mat-cell *matCellDef="let p">{{ p.ano }}</td>
     </ng-container>
 
     <ng-container matColumnDef="ipc">
-      <th mat-header-cell *matHeaderCellDef> IPC </th>
-      <td mat-cell *matCellDef="let p"> {{p.ipc}} </td>
+      <th mat-header-cell *matHeaderCellDef>IPC</th>
+      <td mat-cell *matCellDef="let p">{{ p.ipc }}</td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['numero','titulo','data','ipc']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['numero','titulo','data','ipc'];"></tr>
+    <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+    <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+
   </table>
 
+</div>
